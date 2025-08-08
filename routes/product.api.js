@@ -16,5 +16,6 @@ router.put(
   authController.checkAdminPermission,
   productController.updateProduct
 );
+router.get("/:id", productController.getProductDetail);
 
 module.exports = router;

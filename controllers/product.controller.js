@@ -121,4 +121,14 @@ productController.updateProduct = async (req, res) => {
   }
 };
 
+productController.getProductDetail = async (req, res) => {
+  try {
+    console.log("getProductDetail", req.params);
+    const { id } = req.params;
+    const product = await Product.findById(id);
+    res.status(200).json({ status: "success", product });
+  } catch (error) {
+    res.status(400).json({ status: "fail", message: error.message });
+  }
+};
 module.exports = productController;
