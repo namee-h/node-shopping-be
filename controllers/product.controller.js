@@ -121,6 +121,16 @@ productController.updateProduct = async (req, res) => {
   }
 };
 
+productController.deleteProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await Product.findByIdAndDelete(id);
+    res.status(200).json({ status: "success" });
+  } catch (error) {
+    res.status(400).json({ status: "fail", message: error.message });
+  }
+};
+
 productController.getProductDetail = async (req, res) => {
   try {
     console.log("getProductDetail", req.params);
