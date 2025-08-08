@@ -1,6 +1,6 @@
 const Product = require("../models/Product");
 const productController = {};
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 8;
 productController.createProduct = async (req, res) => {
   try {
     const { sku, name, size, category, price, description, image, stock } =
@@ -79,7 +79,7 @@ productController.getProducts = async (req, res) => {
     let query = Product.find(condition);
     let response = { status: "success" };
     if (page) {
-      query.skip((page - 1) * PAGE_SIZE).limit(PAGE_SIZE);
+      query.skip((page - 1) * PAGE_SIZE).limit(8);
       const totalCount = await Product.countDocuments(condition);
       const totalPageNum = Math.ceil(totalCount / PAGE_SIZE);
       response.totalPageNum = totalPageNum;
