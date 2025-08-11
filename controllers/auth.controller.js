@@ -19,7 +19,7 @@ authController.loginWithEmail = async (req, res) => {
     }
     throw new Error("이메일 혹은 패스워드가 일치하지 않습니다.");
   } catch (error) {
-    res.status(400).json({ status: "fail", error: error.message });
+    return res.status(400).json({ status: "fail", error: error.message });
   }
 };
 authController.authenticate = async (req, res, next) => {
@@ -34,7 +34,7 @@ authController.authenticate = async (req, res, next) => {
 
     next();
   } catch (error) {
-    res.status(400).json({ status: "fail", error: error.message });
+    return res.status(400).json({ status: "fail", error: error.message });
   }
 };
 authController.checkAdminPermission = async (req, res, next) => {
@@ -44,7 +44,7 @@ authController.checkAdminPermission = async (req, res, next) => {
     if (user.level !== "admin") throw new Error("Permission denied");
     next();
   } catch (error) {
-    res.status(400).json({ status: "fail", error: error.message });
+    return res.status(400).json({ status: "fail", error: error.message });
   }
 };
 

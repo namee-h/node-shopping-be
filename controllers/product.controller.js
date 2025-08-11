@@ -125,6 +125,7 @@ productController.deleteProduct = async (req, res) => {
   try {
     const { id } = req.params;
     await Product.findByIdAndDelete(id);
+
     res.status(200).json({ status: "success" });
   } catch (error) {
     res.status(400).json({ status: "fail", message: error.message });
@@ -140,5 +141,37 @@ productController.getProductDetail = async (req, res) => {
   } catch (error) {
     res.status(400).json({ status: "fail", message: error.message });
   }
+};
+
+productController.checkStock = async (item) => {
+  const product = await Product.findById(item.productId);
+  if (product.stock[item.size] < item.qty) {
+    return {
+      isVerify: false,
+      message: `${product.name}의 ${item.size} 재고가 부족합니다.`,
+    };
+  }
+  const newStock = { ...product.stock };
+  newStock[item.size] -= item.qty;
+  product.stock = newStock;
+  await product.save();
+  return {
+    isVerify: true,
+  };
+};
+
+productController.checkItemListStock = async (itemList) => {
+  const insufficientStockItems = [];
+  await Promise.all(
+    itemList.map(async (item) => {
+      const stockCheck = await productController.checkStock(item);
+      if (!stockCheck.isVerify) {
+        insufficientStockItems.push({ item, message: stockCheck.message });
+      }
+      return stockCheck;
+    })
+  );
+
+  return insufficientStockItems;
 };
 module.exports = productController;
