@@ -2,6 +2,7 @@ const Order = require("../models/Order");
 const productController = require("./product.controller");
 const randomStringGenerator = require("../utils/randomStringGenerator");
 const orderController = {};
+const PAGE_SIZE = 3;
 
 orderController.createOrder = async (req, res) => {
   try {
@@ -41,6 +42,37 @@ orderController.getOrder = async (req, res) => {
       select: "name price image stock", // 필요한 상품 정보만 선택
     });
     res.status(200).json({ status: "success", order });
+  } catch (error) {
+    res.status(400).json({ status: "fail", error: error.message });
+  }
+};
+
+orderController.getOrderList = async (req, res) => {
+  try {
+    const { page, orderNum } = req.query;
+    const condition = orderNum
+      ? { orderNum: { $regex: orderNum, $options: "i" } }
+      : {};
+    let query = Order.find(condition)
+      .populate({
+        path: "items.productId",
+        select: "name price image stock",
+      })
+      .populate({
+        path: "userId",
+        select: "email name",
+      })
+      .sort({ createdAt: -1 });
+    let response = { status: "success" };
+    if (page) {
+      query.skip((page - 1) * PAGE_SIZE).limit(PAGE_SIZE);
+      const totalCount = await Order.countDocuments(condition);
+      const totalPageNum = Math.ceil(totalCount / PAGE_SIZE);
+      response.totalPageNum = totalPageNum;
+    }
+    const orderList = await query.exec();
+    response.orderList = orderList;
+    res.status(200).json(response);
   } catch (error) {
     res.status(400).json({ status: "fail", error: error.message });
   }
