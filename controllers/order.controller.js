@@ -33,4 +33,16 @@ orderController.createOrder = async (req, res) => {
   }
 };
 
+orderController.getOrder = async (req, res) => {
+  try {
+    const { userId } = req;
+    const order = await Order.find({ userId }).populate({
+      path: "items.productId",
+      select: "name price image stock", // 필요한 상품 정보만 선택
+    });
+    res.status(200).json({ status: "success", order });
+  } catch (error) {
+    res.status(400).json({ status: "fail", error: error.message });
+  }
+};
 module.exports = orderController;
